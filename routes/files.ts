@@ -72,7 +72,7 @@ router.post("/email", async (req, res) => {
         pass: process.env.SENDINBLUE_SMTP_PASSWORD,
       },
     });
-    
+
     // setup e-mail data with unicode symbols
     var mailOptions = {
       from: emailFrom, // sender address

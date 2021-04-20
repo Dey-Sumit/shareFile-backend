@@ -1,8 +1,8 @@
-import mongose from "mongoose";
+import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    await mongose.connect(process.env.MONGO_URI!, {
+    await mongoose.connect(process.env.MONGO_URI!, {
       useNewUrlParser: true,
       useFindAndModify: true,
       useUnifiedTopology: true,
@@ -12,7 +12,7 @@ const connectDB = async () => {
     console.log("connection error ", error.message);
   }
 
-  const connection = mongose.connection;
+  const connection = mongoose.connection;
 
   if (connection.readyState >= 1) {
     console.log("connected to database");

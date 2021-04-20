@@ -11,12 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//hack :( for typescript global
-const globalAny: any = global;
-globalAny.__basedir = __dirname;
-console.log(globalAny.__basedir);
+// //hack :( for typescript global
+// const globalAny: any = global;
+// globalAny.__basedir = __dirname;
+// console.log(globalAny.__basedir);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 connectDB();
 
 app.use("/api/files", fileRoute);
