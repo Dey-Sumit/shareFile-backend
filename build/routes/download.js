@@ -17,14 +17,16 @@ const file_1 = __importDefault(require("../models/file"));
 const router = express_1.default.Router();
 router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
+    console.log("got it");
     try {
         const file = yield file_1.default.findById(id);
         if (!file)
-            return res.status(404).json({ message: "Download link is expired" });
+            return res.status(404).json({ message: "File not found" });
         const directoryPath = `${__dirname}/../${file.path}`;
         res.download(directoryPath);
     }
     catch (error) {
+        console.log(error.message);
         return res.status(500).json({ message: "Server is broken" });
     }
 }));
