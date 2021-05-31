@@ -1,22 +1,13 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
 import File from "../models/file";
 import nodemailer from "nodemailer";
 import emailTemplate from "../assets/emailTemplate";
+import { UploadApiResponse, v2 as cloudinary } from "cloudinary";
 
 const router = express.Router();
 
-let storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.round(
-      Math.random() * 1000
-    )}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
-
+const storage = multer.diskStorage({});
 let upload = multer({
   storage,
 });
@@ -27,12 +18,30 @@ router.post("/upload", upload.single("myFile"), async (req, res) => {
     if (!req.file) {
       return res.json({ error: "Bro!!! file is required" });
     }
-    const { filename, path, size } = req.file;
+
+    const { originalname } = req.file;
+
+    let uploadedFile: UploadApiResponse;
+
+    try {
+      uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+        use_filename: true, // not working
+        folder: "shareme",
+        resource_type: "auto", // for all type of files
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ messages: error.message });
+    }
+
+    const { secure_url, bytes, format } = uploadedFile;
     const file = await File.create({
-      filename,
-      path,
-      size,
+      filename: originalname,
+      sizeInBytes: bytes,
+      secure_url,
+      format,
     });
+
     return res.status(200).json({
       id: file._id,
       downloadPageLink: `${process.env.BASE_ENDPOINT_CLIENT}/download/${file._id}`,
@@ -61,7 +70,9 @@ router.post("/email", async (req, res) => {
   // if the file exists
   if (file) {
     const downloadLink = `${process.env.BASE_ENDPOINT_CLIENT}/download/${file._id}`;
-    const fileSize = `${(Number(file.size) / (1024 * 1024)).toFixed(2)} MB`;
+    const fileSize = `${(Number(file.sizeInBytes) / (1024 * 1024)).toFixed(
+      2
+    )} MB`;
 
     const transporter = nodemailer.createTransport({
       host: process.env.SENDINBLUE_SMTP_HOST,
@@ -111,12 +122,12 @@ router.get("/:id", async (req, res) => {
     if (!file) {
       return res.status(404).json({ message: "File not found" });
     }
-    const { filename, size } = file;
+    const { filename, sizeInBytes } = file;
     const downloadLink = `${process.env.BASE_ENDPOINT_CLIENT}/download/${file._id}`;
     return res.status(200).json({
       id,
       filename,
-      size,
+      size: sizeInBytes,
       downloadLink,
     });
   } catch (error) {

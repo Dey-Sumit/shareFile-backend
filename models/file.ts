@@ -8,11 +8,15 @@ const fileSchema = new Schema(
       type: String,
       required: true,
     },
-    path: {
+    secure_url: {
       type: String,
       required: true,
     },
-    size: {
+    format: {
+      type: String,
+      require: true,
+    },
+    sizeInBytes: {
       type: String,
       required: true,
     },
@@ -29,8 +33,9 @@ const fileSchema = new Schema(
 );
 interface IFile extends Document {
   filename: string;
-  path: string;
-  size: string;
+  secure_url: string;
+  sizeInBytes: string;
+  format: string;
   sender: string;
   receiver: string;
 }

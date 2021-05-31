@@ -1,6 +1,6 @@
 import express from "express";
 import File from "../models/file";
-
+import https from "https";
 const router = express.Router();
 
 router.get("/:id", async (req, res) => {
@@ -11,9 +11,11 @@ router.get("/:id", async (req, res) => {
     const file = await File.findById(id);
     if (!file) return res.status(404).json({ message: "File not found" });
 
-    const directoryPath = `${__dirname}/../${file.path}`;
+    https.get(file.secure_url, (file) => {
+      console.log(file);
 
-    res.download(directoryPath);
+      file.pipe(res);
+    });
   } catch (error) {
     console.log(error.message);
 

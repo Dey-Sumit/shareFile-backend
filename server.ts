@@ -4,9 +4,22 @@ import dotenv from "dotenv";
 import fileRoute from "./routes/files";
 import downloadRoute from "./routes/download";
 import cors from "cors";
+import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 const app = express();
+
+console.log(
+  process.env.CLOUDINARY_CLOUD_NAME,
+  process.env.CLOUDINARY_API_KEY,
+  process.env.CLOUDINARY_API_SECRET
+);
 
 app.use(cors());
 app.use(express.json());
